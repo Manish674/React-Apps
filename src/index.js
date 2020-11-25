@@ -1,23 +1,37 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import SeasonDisplay from './SeasonDisplay';
+import Loader from './Loader'
 
 // Create a class and extend it with react.component
 class App extends React.Component {
-    // Get the constructor
-    constructor(props) {
-        super(props);
-        
-        // code state here
-        this.state = { lat: null};
-    };
+    state = { lat: null, errorMsg: ''};      
 
-    // A class is nothing without the render fuc 
+    componentDidMount() {
+        // Geolocation api
+        window.navigator.geolocation.getCurrentPosition(
+            position => this.state = this.setState({ lat: position.coords.latitude }),
+            err => this.state = this.setState({ errorMsg: err.message }) 
+        )     
+    }
+
+    renderContent () {
+        if (!this.state.errorMsg && this.state.lat) {
+            return <SeasonDisplay lat={this.state.lat}/>;
+        }
+        
+        if (this.state.errorMsg && !this.state.lat) {
+            return <div>Error: {this.state.errorMsg}</div>; 
+        }
+
+        
+        return <Loader message="Did you accepted the location request"/>;
+
+    }    
+
     render () {
-    // than it's time to render some jsx
-        return (
-            <div>Hello world</div>
-        );
-    };
+        return <div>{this.renderContent()}</div>
+    }
 };
 
 
